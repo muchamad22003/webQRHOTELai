@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Data Pengunjung</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 400px;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #06b6d4;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover {
+    background-color: #0891b2;
+  }
+  #status {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Form Pengunjung</h2>
+    <form id="dataForm">
+      <label>Timestamp</label>
+      <input type="text" id="timestamp" readonly>
+
+      <label>Nama Pengunjung</label>
+      <input type="text" id="nama" placeholder="Masukkan nama" required>
+
+      <label>Nama Hotel</label>
+      <input type="text" id="hotel" placeholder="Masukkan nama hotel" required>
+
+      <button type="submit">Kirim Data</button>
+    </form>
+    <div id="status">Menunggu input...</div>
+  </div>
+
+<script>
+// === GANTI URL INI DENGAN URL WEB APP GOOGLE SCRIPT ===
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwq6bnDyQ3_pw3CbCocK192kRVXRO6_EBs4TNCXqNsPnqNCvgSmfnP9bF_0bI4s6abf9w/exec';
+
+const form = document.getElementById('dataForm');
+const timestamp = document.getElementById('timestamp');
+const statusEl = document.getElementById('status');
+
+// update timestamp otomatis
+function updateTime() {
+  const now = new Date();
+  timestamp.value = now.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// kirim data ke Google Apps Script
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  statusEl.textContent = 'Mengirim data...';
+
+  const data = {
+    timestamp: timestamp.value,
+    nama: document.getElementById('nama').value,
+    hotel: document.getElementById('hotel').value
+  };
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    statusEl.textContent = '✅ Data berhasil dikirim!';
+    form.reset();
+    updateTime();
+  })
+  .catch(() => {
+    statusEl.textContent = '❌ Gagal mengirim data.';
+  });
+});
+</script>
+</body>
+</html>
